@@ -1,2 +1,4 @@
 run.sh
 tetriC
+shell.nix
+flake.lock

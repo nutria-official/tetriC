@@ -5,8 +5,8 @@
 #include <time.h>
 #include <raylib.h>
 
-#define WINDOW_HEIGHT 24 * (2 + 20)
-#define WINDOW_WIDTH 10 * (2 + 20)
+#define WINDOW_HEIGHT 24 * 20
+#define WINDOW_WIDTH 10 * 20
 
 enum tetrominoes {
   t,
@@ -31,7 +31,7 @@ struct block {
 
 struct block place_block();
 void update(bool grid[10][24], struct block *piece);
-void player_input(bool grid[10][24], struct block *piece);
+void player_inputs(bool grid[10][24], struct block *piece);
 bool floor_collision(struct block piece);
 bool tetromino_collision(bool grid[10][24], struct block piece);
 void print_board(bool grid [10][24], struct block piece);
@@ -40,13 +40,13 @@ int main() {
   srand(time(NULL));
   bool grid[10][24] = {false};
   struct block piece = place_block();
-  InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "tetrC");
+  InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "tetriC");
   SetTargetFPS(60);
 
   print_board(grid, piece);
   while(!WindowShouldClose()) {
     sleep(1);
-    //player_input(grid, &piece);
+    player_inputs(grid, &piece);
     update(grid, &piece);
     print_board(grid, piece);
   }
@@ -173,7 +173,9 @@ void print_board(bool grid[10][24], struct block piece) {
   ClearBackground(RAYWHITE);
     for (int i = 0; i < 24; i++) {
       for (int j = 0; j < 10; j++) {
-        DrawRectangle(i, j, 20, 20, RED); 
+        if (grid[j][i] == true) {
+          DrawRectangle(j * 20, i * 20, 20, 20, RED); 
+        }
       }
     }
   EndDrawing();
@@ -202,10 +204,15 @@ bool tetromino_collision(bool grid[10][24], struct block piece) {
 }
 
 
-//void player_input(struct block grid[10][24], struct coordinate block[4]) {
-//  char input;
-//  fgets()
-//}
+void player_inputs(bool grid[10][24], struct block *piece) {
+  if (IsKeyDown(KEY_RIGHT) && piece->coord[0].x + 1 < 24) {
+    for (int i = 0; i < 4; i++) {
+      grid[piece->coord[i].x][piece->coord[i].y] = false;
+      piece->coord[i].x++; 
+      grid[piece->coord[i].x][piece->coord[i].y] = true;
+    }
+  }
+}
 
 
 

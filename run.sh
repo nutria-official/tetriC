@@ -1,1 +1,1 @@
-clang -std=c99 -Werror -Wall -o tetriC main.c
+clang -o tetriC main.c -lraylib -lm -lGL -ldl -lpthread -Werror -Wall -std=c99
