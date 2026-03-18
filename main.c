@@ -50,6 +50,7 @@ int main() {
     update(grid, &piece);
     print_board(grid, piece);
   }
+  CloseWindow();
   return 0;
 }
 
@@ -168,25 +169,14 @@ void update(bool grid[10][24], struct block *piece) {
 }
 
 void print_board(bool grid[10][24], struct block piece) {
-  for (int i = 0; i < 10; i++) {
-    printf("---");
-  }
-  printf("\n");
-  for (int i = 0; i < 24; i++) {
-    for (int j = 0; j < 10; j++) {
-      if(grid[j][i]) {
-        printf("O  ");
-      } else {
-        printf("   ");
+  BeginDrawing();
+  ClearBackground(RAYWHITE);
+    for (int i = 0; i < 24; i++) {
+      for (int j = 0; j < 10; j++) {
+        DrawRectangle(i, j, 20, 20, RED); 
       }
     }
-    printf("\n");
-  }
-  for (int i = 0; i < 10; i++) {
-    printf("---");
-  }
-  printf("\n");
-  printf("Type: %d\n", piece.tetromino);
+  EndDrawing();
 }
 
 bool floor_collision(struct block piece) {
