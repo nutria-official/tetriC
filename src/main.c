@@ -33,11 +33,13 @@ struct coordinate {
 
 struct Grid {
   enum types type;
+  struct Color colour;
 };
 
 struct block {
   struct coordinate coord[4];
   enum tetrominoes tetromino;
+  struct Color colour;
 };
 
 struct block place_block();
@@ -49,7 +51,12 @@ void print_board(struct Grid[WIDE][HEIGHT], struct block piece);
 
 int main() {
   srand(time(NULL));
-  struct Grid grid[WIDE][HEIGHT] = {false};
+  struct Grid grid[WIDE][HEIGHT];
+  for (int i = 0; i < WIDE; i++) {
+    for (int j = 0; j < HEIGHT; j++) {
+      grid[i][j].type = empty;
+    }
+  }
   struct block piece = place_block();
   InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "tetriC");
   SetTargetFPS(60);
@@ -74,6 +81,7 @@ struct block place_block() {
   piece.tetromino = rand() % 7;
   switch (piece.tetromino) {
     case t:
+      piece.colour = PURPLE;
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -87,6 +95,7 @@ struct block place_block() {
       piece.coord[3].y = 1;
       break;
     case i:
+      piece.colour = BLUE;
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -100,6 +109,7 @@ struct block place_block() {
       piece.coord[3].y = 3;
       break;
     case l:
+      piece.colour = ORANGE;
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -113,6 +123,7 @@ struct block place_block() {
       piece.coord[3].y = 2;
       break;
     case j:
+      piece.colour = BLUE;
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -126,6 +137,7 @@ struct block place_block() {
       piece.coord[3].y = 2;
       break;
     case z:
+      piece.colour = RED;
       piece.coord[0].x = 4;
       piece.coord[0].y = 0;
 
@@ -139,6 +151,7 @@ struct block place_block() {
       piece.coord[3].y = 1;
       break;
     case s:
+      piece.colour = GREEN;
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -152,6 +165,7 @@ struct block place_block() {
       piece.coord[3].y = 1;
       break;
     case o:
+      piece.colour = YELLOW;
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -182,6 +196,7 @@ void update(struct Grid grid[WIDE][HEIGHT], struct block *piece) {
       grid[piece->coord[i].x][piece->coord[i].y].type = empty;
       piece->coord[i].y++; 
       grid[piece->coord[i].x][piece->coord[i].y].type = falling;
+      grid[piece->coord[i].x][piece->coord[i].y].colour = piece->colour;
     }
   }
 }
@@ -197,7 +212,7 @@ void print_board(struct Grid grid[WIDE][HEIGHT], struct block piece) {
     for (int i = 0; i < HEIGHT; i++) {
       for (int j = 0; j < WIDE; j++) {
         if (grid[j][i].type == falling || grid[j][i].type == scrap) {
-          DrawRectangle(calibration_width + j * SQUARE_EDGE, calibration_height + i * SQUARE_EDGE, SQUARE_EDGE, SQUARE_EDGE, RED);
+          DrawRectangle(calibration_width + j * SQUARE_EDGE, calibration_height + i * SQUARE_EDGE, SQUARE_EDGE, SQUARE_EDGE, grid[j][i].colour);
         }
       }
     }
@@ -224,26 +239,42 @@ bool tetromino_collision(struct Grid grid[WIDE][HEIGHT], struct block piece) {
 
 void player_inputs(struct Grid grid[WIDE][HEIGHT], struct block *piece) {
   if (IsKeyPressed(KEY_RIGHT)
-    && piece->coord[0].x < WIDE - 1
+    && ((piece->coord[0].x < WIDE - 1
     && piece->coord[1].x < WIDE - 1
     && piece->coord[2].x < WIDE - 1
     && piece->coord[3].x < WIDE - 1
+  )&&(
+    grid[piece->coord[0].x + 1][piece->coord[0].y].type != scrap
+    && grid[piece->coord[1].x + 1][piece->coord[1].y].type != scrap
+    && grid[piece->coord[2].x + 1][piece->coord[2].y].type != scrap
+    && grid[piece->coord[3].x + 1][piece->coord[3].y].type != scrap
+    )
+  )
   ) {
     for (int i = 3; i >= 0; i--) { // -- do to the way that the tetromino_subsquares are drawn.
       grid[piece->coord[i].x][piece->coord[i].y].type = empty;
       piece->coord[i].x++; 
       grid[piece->coord[i].x][piece->coord[i].y].type = falling;
+      grid[piece->coord[i].x][piece->coord[i].y].colour = piece->colour;
     }
   } else if (IsKeyPressed(KEY_LEFT)
-    && piece->coord[0].x > 0
+    && ((piece->coord[0].x > 0
     && piece->coord[1].x > 0
     && piece->coord[2].x > 0
     && piece->coord[3].x > 0
+    )&&(
+    grid[piece->coord[0].x - 1][piece->coord[0].y].type != scrap
+    && grid[piece->coord[1].x - 1][piece->coord[1].y].type != scrap
+    && grid[piece->coord[2].x - 1][piece->coord[2].y].type != scrap
+    && grid[piece->coord[3].x - 1][piece->coord[3].y].type != scrap
+    )
+  )
   ) {
     for (int i = 0; i < 4; i++) {
       grid[piece->coord[i].x][piece->coord[i].y].type = empty;
       piece->coord[i].x--; 
       grid[piece->coord[i].x][piece->coord[i].y].type = falling;
+      grid[piece->coord[i].x][piece->coord[i].y].colour = piece->colour;
     }
   }
 }
