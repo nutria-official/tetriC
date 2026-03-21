@@ -48,6 +48,7 @@ void player_inputs(struct Grid grid[WIDE][HEIGHT], struct block *piece);
 bool floor_collision(struct block piece);
 bool tetromino_collision(struct Grid grid[WIDE][HEIGHT], struct block piece);
 void print_board(struct Grid[WIDE][HEIGHT], struct block piece);
+void clear_lines(struct Grid grid[WIDE][HEIGHT]);
 
 int main() {
   srand(time(NULL));
@@ -199,6 +200,7 @@ void update(struct Grid grid[WIDE][HEIGHT], struct block *piece) {
       grid[piece->coord[i].x][piece->coord[i].y].colour = piece->colour;
     }
   }
+  clear_lines(grid);
 }
 
 void print_board(struct Grid grid[WIDE][HEIGHT], struct block piece) {
@@ -236,6 +238,24 @@ bool tetromino_collision(struct Grid grid[WIDE][HEIGHT], struct block piece) {
   return false;
 }
 
+void clear_lines(struct Grid grid[WIDE][HEIGHT]) {
+  for (int i = 0; i < HEIGHT; i++) {
+    int empty_spaces = 0;
+    for (int j = 0; j < WIDE; j++) {
+      if (grid[j][i].type == scrap) {
+        empty_spaces++;
+      }
+    }
+    if (empty_spaces == WIDE) {
+      for (int k = i; k > 1; k--) {
+        for (int l = 0; l < WIDE; l++) {
+          grid[l][k].colour = grid[l][k - 1].colour;
+          grid[l][k].type = grid[l][k - 1].type;
+        }
+      }
+    } 
+  }
+}
 
 void player_inputs(struct Grid grid[WIDE][HEIGHT], struct block *piece) {
   if (IsKeyPressed(KEY_RIGHT)
