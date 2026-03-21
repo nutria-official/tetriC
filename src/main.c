@@ -194,8 +194,8 @@ void print_board(struct Grid grid[WIDE][HEIGHT], struct block piece) {
   // Draw map.
   DrawRectangle(calibration_width, calibration_height, WIDE*SQUARE_EDGE, HEIGHT*SQUARE_EDGE, BLACK);
   // Draw blocks,
-    for (int i = 0; i < 24; i++) {
-      for (int j = 0; j < 10; j++) {
+    for (int i = 0; i < HEIGHT; i++) {
+      for (int j = 0; j < WIDE; j++) {
         if (grid[j][i].type == falling || grid[j][i].type == scrap) {
           DrawRectangle(calibration_width + j * SQUARE_EDGE, calibration_height + i * SQUARE_EDGE, SQUARE_EDGE, SQUARE_EDGE, RED);
         }
@@ -205,7 +205,7 @@ void print_board(struct Grid grid[WIDE][HEIGHT], struct block piece) {
 }
 
 bool floor_collision(struct block piece) {
-  if (piece.coord[3].y == 23) {
+  if (piece.coord[3].y == HEIGHT - 1) {
   return true; 
   }
   return false;
@@ -224,10 +224,10 @@ bool tetromino_collision(struct Grid grid[WIDE][HEIGHT], struct block piece) {
 
 void player_inputs(struct Grid grid[WIDE][HEIGHT], struct block *piece) {
   if (IsKeyPressed(KEY_RIGHT)
-    && piece->coord[0].x < 9
-    && piece->coord[1].x < 9
-    && piece->coord[2].x < 9
-    && piece->coord[3].x < 9
+    && piece->coord[0].x < WIDE - 1
+    && piece->coord[1].x < WIDE - 1
+    && piece->coord[2].x < WIDE - 1
+    && piece->coord[3].x < WIDE - 1
   ) {
     for (int i = 3; i >= 0; i--) { // -- do to the way that the tetromino_subsquares are drawn.
       grid[piece->coord[i].x][piece->coord[i].y].type = empty;
