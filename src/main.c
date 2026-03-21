@@ -5,8 +5,11 @@
 #include <time.h>
 #include <raylib.h>
 
-#define WINDOW_HEIGHT 24 * 20
-#define WINDOW_WIDTH 10 * 20
+#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH 1280
+#define SQUARE_EDGE 30
+#define WIDE 10
+#define HEIGHT 24
 
 enum tetrominoes {
   t,
@@ -42,12 +45,16 @@ int main() {
   struct block piece = place_block();
   InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "tetriC");
   SetTargetFPS(60);
+  int frame_counter = 0;
 
   print_board(grid, piece);
   while(!WindowShouldClose()) {
-    sleep(1);
+    frame_counter++;
     player_inputs(grid, &piece);
-    update(grid, &piece);
+    if (frame_counter >= 20) {
+      update(grid, &piece);
+      frame_counter = 0;
+    }
     print_board(grid, piece);
   }
   CloseWindow();
@@ -104,10 +111,10 @@ struct block place_block() {
       piece.coord[1].x = 5;
       piece.coord[1].y = 1;
 
-      piece.coord[2].x = 5;
+      piece.coord[2].x = 4;
       piece.coord[2].y = 2;
 
-      piece.coord[3].x = 4;
+      piece.coord[3].x = 5;
       piece.coord[3].y = 2;
       break;
     case z:
@@ -130,10 +137,10 @@ struct block place_block() {
       piece.coord[1].x = 6;
       piece.coord[1].y = 0;
 
-      piece.coord[2].x = 5;
+      piece.coord[2].x = 4;
       piece.coord[2].y = 1;
 
-      piece.coord[3].x = 4;
+      piece.coord[3].x = 5;
       piece.coord[3].y = 1;
       break;
     case o:
@@ -169,12 +176,17 @@ void update(bool grid[10][24], struct block *piece) {
 }
 
 void print_board(bool grid[10][24], struct block piece) {
+  int calibration_width = WINDOW_WIDTH/2 - WIDE*SQUARE_EDGE/2;
+  int calibration_height = WINDOW_HEIGHT/2 - HEIGHT*SQUARE_EDGE/2;
   BeginDrawing();
   ClearBackground(RAYWHITE);
+  // Draw map.
+  DrawRectangle(calibration_width, calibration_height, WIDE*SQUARE_EDGE, HEIGHT*SQUARE_EDGE, BLACK);
+  // Draw blocks,
     for (int i = 0; i < 24; i++) {
       for (int j = 0; j < 10; j++) {
         if (grid[j][i] == true) {
-          DrawRectangle(j * 20, i * 20, 20, 20, RED); 
+          DrawRectangle(calibration_width + j * SQUARE_EDGE, calibration_height + i * SQUARE_EDGE, SQUARE_EDGE, SQUARE_EDGE, RED);
         }
       }
     }
@@ -205,10 +217,26 @@ bool tetromino_collision(bool grid[10][24], struct block piece) {
 
 
 void player_inputs(bool grid[10][24], struct block *piece) {
-  if (IsKeyDown(KEY_RIGHT) && piece->coord[0].x + 1 < 24) {
-    for (int i = 0; i < 4; i++) {
+  if (IsKeyPressed(KEY_RIGHT)
+    && piece->coord[0].x < 9
+    && piece->coord[1].x < 9
+    && piece->coord[2].x < 9
+    && piece->coord[3].x < 9
+  ) {
+    for (int i = 3; i >= 0; i--) { // -- do to the way that the tetromino_subsquares are drawn.
       grid[piece->coord[i].x][piece->coord[i].y] = false;
       piece->coord[i].x++; 
+      grid[piece->coord[i].x][piece->coord[i].y] = true;
+    }
+  } else if (IsKeyPressed(KEY_LEFT)
+    && piece->coord[0].x > 0
+    && piece->coord[1].x > 0
+    && piece->coord[2].x > 0
+    && piece->coord[3].x > 0
+  ) {
+    for (int i = 0; i < 4; i++) {
+      grid[piece->coord[i].x][piece->coord[i].y] = false;
+      piece->coord[i].x--; 
       grid[piece->coord[i].x][piece->coord[i].y] = true;
     }
   }
