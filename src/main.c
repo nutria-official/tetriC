@@ -19,12 +19,20 @@ enum tetrominoes {
   z,
   s,
   o,
-  empty,
+  oops,
 };
-
+enum types {
+  empty,
+  falling,
+  scrap,
+};
 struct coordinate {
   int x;
   int y;
+};
+
+struct Grid {
+  enum types type;
 };
 
 struct block {
@@ -33,15 +41,15 @@ struct block {
 };
 
 struct block place_block();
-void update(bool grid[10][24], struct block *piece);
-void player_inputs(bool grid[10][24], struct block *piece);
+void update(struct Grid grid[WIDE][HEIGHT], struct block *piece);
+void player_inputs(struct Grid grid[WIDE][HEIGHT], struct block *piece);
 bool floor_collision(struct block piece);
-bool tetromino_collision(bool grid[10][24], struct block piece);
-void print_board(bool grid [10][24], struct block piece);
+bool tetromino_collision(struct Grid grid[WIDE][HEIGHT], struct block piece);
+void print_board(struct Grid[WIDE][HEIGHT], struct block piece);
 
 int main() {
   srand(time(NULL));
-  bool grid[10][24] = {false};
+  struct Grid grid[WIDE][HEIGHT] = {false};
   struct block piece = place_block();
   InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "tetriC");
   SetTargetFPS(60);
@@ -51,7 +59,7 @@ int main() {
   while(!WindowShouldClose()) {
     frame_counter++;
     player_inputs(grid, &piece);
-    if (frame_counter >= 20) {
+    if (frame_counter >= 10) {
       update(grid, &piece);
       frame_counter = 0;
     }
@@ -157,25 +165,28 @@ struct block place_block() {
       piece.coord[3].y = 1;
       break;
     default:
-      piece.tetromino = empty;
+      piece.tetromino = oops;
       break;
   }
   return piece;
 }
 
-void update(bool grid[10][24], struct block *piece) {
+void update(struct Grid grid[WIDE][HEIGHT], struct block *piece) {
   if(floor_collision(*piece) || tetromino_collision(grid, *piece)) {
+    for (int i = 3; i >= 0; i--){
+      grid[piece->coord[i].x][piece->coord[i].y].type = scrap;
+    }
     *piece = place_block();
   } else {
     for (int i = 3; i >= 0; i--){
-      grid[piece->coord[i].x][piece->coord[i].y] = false;
+      grid[piece->coord[i].x][piece->coord[i].y].type = empty;
       piece->coord[i].y++; 
-      grid[piece->coord[i].x][piece->coord[i].y] = true;
+      grid[piece->coord[i].x][piece->coord[i].y].type = falling;
     }
   }
 }
 
-void print_board(bool grid[10][24], struct block piece) {
+void print_board(struct Grid grid[WIDE][HEIGHT], struct block piece) {
   int calibration_width = WINDOW_WIDTH/2 - WIDE*SQUARE_EDGE/2;
   int calibration_height = WINDOW_HEIGHT/2 - HEIGHT*SQUARE_EDGE/2;
   BeginDrawing();
@@ -185,7 +196,7 @@ void print_board(bool grid[10][24], struct block piece) {
   // Draw blocks,
     for (int i = 0; i < 24; i++) {
       for (int j = 0; j < 10; j++) {
-        if (grid[j][i] == true) {
+        if (grid[j][i].type == falling || grid[j][i].type == scrap) {
           DrawRectangle(calibration_width + j * SQUARE_EDGE, calibration_height + i * SQUARE_EDGE, SQUARE_EDGE, SQUARE_EDGE, RED);
         }
       }
@@ -201,14 +212,9 @@ bool floor_collision(struct block piece) {
 }
 
 
-bool tetromino_collision(bool grid[10][24], struct block piece) {
+bool tetromino_collision(struct Grid grid[WIDE][HEIGHT], struct block piece) {
   for (int i = 0; i < 4; i++) {
-    if (grid[piece.coord[i].x][piece.coord[i].y + 1] == true
-        && piece.coord[i].y + 1 != piece.coord[0].y
-        && piece.coord[i].y + 1 != piece.coord[1].y
-        && piece.coord[i].y + 1 != piece.coord[2].y
-        && piece.coord[i].y + 1 != piece.coord[3].y
-    ) {
+    if (grid[piece.coord[i].x][piece.coord[i].y + 1].type == scrap) {
       return true;
     }
   }
@@ -216,7 +222,7 @@ bool tetromino_collision(bool grid[10][24], struct block piece) {
 }
 
 
-void player_inputs(bool grid[10][24], struct block *piece) {
+void player_inputs(struct Grid grid[WIDE][HEIGHT], struct block *piece) {
   if (IsKeyPressed(KEY_RIGHT)
     && piece->coord[0].x < 9
     && piece->coord[1].x < 9
@@ -224,9 +230,9 @@ void player_inputs(bool grid[10][24], struct block *piece) {
     && piece->coord[3].x < 9
   ) {
     for (int i = 3; i >= 0; i--) { // -- do to the way that the tetromino_subsquares are drawn.
-      grid[piece->coord[i].x][piece->coord[i].y] = false;
+      grid[piece->coord[i].x][piece->coord[i].y].type = empty;
       piece->coord[i].x++; 
-      grid[piece->coord[i].x][piece->coord[i].y] = true;
+      grid[piece->coord[i].x][piece->coord[i].y].type = falling;
     }
   } else if (IsKeyPressed(KEY_LEFT)
     && piece->coord[0].x > 0
@@ -235,9 +241,9 @@ void player_inputs(bool grid[10][24], struct block *piece) {
     && piece->coord[3].x > 0
   ) {
     for (int i = 0; i < 4; i++) {
-      grid[piece->coord[i].x][piece->coord[i].y] = false;
+      grid[piece->coord[i].x][piece->coord[i].y].type = empty;
       piece->coord[i].x--; 
-      grid[piece->coord[i].x][piece->coord[i].y] = true;
+      grid[piece->coord[i].x][piece->coord[i].y].type = falling;
     }
   }
 }
