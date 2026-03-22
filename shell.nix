@@ -10,6 +10,6 @@ pkgs.mkShell {
 
   shellHook = ''
     export LD_LIBRARY_PATH="${pkgs.raylib}/lib:$LD_LIBRARY_PATH"
-    echo "Raylib environment ready. Compile with: clang main.c -lraylib -lm -lGL -ldl -lpthread"
+    echo "tetriC environtment loaded. Compile with ./run.c"
   '';
 }
