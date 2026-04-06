@@ -7,7 +7,8 @@ struct block place_block();
 
 int main() {
   int frame_counter = 0;
-  struct Grid grid[WIDE][HEIGHT];
+  int speed = 60;
+  struct Grid grid[GRID_WIDTH][GRID_HEIGHT];
   struct block piece = place_block();
 
   initialize_game(grid);
@@ -15,8 +16,8 @@ int main() {
 
   while(!WindowShouldClose()) {
     frame_counter++;
-    player_inputs(grid, &piece);
-    if (frame_counter >= 10) {
+    player_inputs(grid, &piece, &speed);
+    if (frame_counter >= speed) {
       update(grid, &piece);
       frame_counter = 0;
     }
@@ -31,7 +32,7 @@ struct block place_block() {
   piece.tetromino = rand() % 7;
   switch (piece.tetromino) {
     case t:
-      piece.colour = PURPLE;
+      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -45,7 +46,7 @@ struct block place_block() {
       piece.coord[3].y = 1;
       break;
     case i:
-      piece.colour = BLUE;
+      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -59,7 +60,7 @@ struct block place_block() {
       piece.coord[3].y = 3;
       break;
     case l:
-      piece.colour = ORANGE;
+      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -73,7 +74,7 @@ struct block place_block() {
       piece.coord[3].y = 2;
       break;
     case j:
-      piece.colour = BLUE;
+      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -87,7 +88,7 @@ struct block place_block() {
       piece.coord[3].y = 2;
       break;
     case z:
-      piece.colour = RED;
+      piece.colour = (Color){rand()%256,rand()%256,rand()%256,255};
       piece.coord[0].x = 4;
       piece.coord[0].y = 0;
 
@@ -101,7 +102,7 @@ struct block place_block() {
       piece.coord[3].y = 1;
       break;
     case s:
-      piece.colour = GREEN;
+      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 
@@ -115,7 +116,7 @@ struct block place_block() {
       piece.coord[3].y = 1;
       break;
     case o:
-      piece.colour = YELLOW;
+      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
       piece.coord[0].x = 5;
       piece.coord[0].y = 0;
 

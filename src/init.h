@@ -3,6 +3,6 @@
 #include "main.h"
 #include <time.h>
 
-void initialize_game(struct Grid grid[WIDE][HEIGHT]);
+void initialize_game(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]);
 
 #endif

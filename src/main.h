@@ -3,9 +3,10 @@
 
 #include <raylib.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-#define WIDE 10 // The playing grids horizontal length.
-#define HEIGHT 24 // The playing grids vertical length.
+#define GRID_WIDTH 10 // The playing grids horizontal length.
+#define GRID_HEIGHT 24 // The playing grids vertical length.
 #define WINDOW_HEIGHT 720
 #define WINDOW_WIDTH 1280
 #define SQUARE_EDGE 30 // Amount of pixels one side of a drawn square is wide.
@@ -38,7 +39,7 @@ struct Grid {
 };
 
 struct block {
-  struct coordinate coord[4];
+  struct coordinate coord[4]; // Matrix size for all blocks.
   enum tetrominoes tetromino;
   struct Color colour;
 };
