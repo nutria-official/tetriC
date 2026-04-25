@@ -15,10 +15,18 @@
 struct block place_block();
 struct coordinates place_sub_block(struct block piece, struct coordinates sub_coord);
 
+extern int gamestate;
+
 enum types {
   empty,
   falling,
   scrap,
+};
+
+enum game_states {
+  menu,
+  playing,
+  dead,
 };
 
 enum directinos {

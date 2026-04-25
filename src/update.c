@@ -14,6 +14,10 @@ void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
   
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
+        if (grid[piece->position.x + j][piece->position.y + i].type == scrap) {
+          gamestate = dead;
+          printf("You dead fr bruh, git gut\n");
+        }
         if (piece->coord[j][i] == falling) {
           grid[piece->position.x + j][i].type = falling;
           grid[piece->position.x + j][i].colour = piece->colour;

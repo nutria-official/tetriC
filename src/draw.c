@@ -16,9 +16,6 @@ void draw(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block piece) {
       }
     }
   EndDrawing();
-  int this_colour = ColorToInt(piece.colour);
-  printf("Colour: %d\n", this_colour);
-  printf("coord.y: %d\n", piece.position.y);
 }
 
 

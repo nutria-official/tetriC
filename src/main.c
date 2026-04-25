@@ -5,14 +5,14 @@
 #include <stdlib.h>
 
 struct block place_block();
+int gamestate = playing;
 
 int main() {
   int frame_counter = 0;
   int frames_between_fall = 60;
   struct Grid grid[GRID_WIDTH][GRID_HEIGHT];
-  struct block piece = place_block();
-
   initialize_game(grid);
+  struct block piece = place_block();
 
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
@@ -27,12 +27,21 @@ int main() {
 
   while(!WindowShouldClose()) {
     frame_counter++;
-    player_inputs(grid, &piece, &frames_between_fall);
-    if (frame_counter >= frames_between_fall) {
-      update(grid, &piece);
-      frame_counter = 0;
+    if (gamestate == playing) {
+      player_inputs(grid, &piece, &frames_between_fall);
+      if (frame_counter >= frames_between_fall) {
+        update(grid, &piece);
+        frame_counter = 0;
+      }
+      draw(grid, piece);
+    } else if (gamestate == dead) {
+      for (int i = 0; i < GRID_WIDTH; i++) {
+        for (int j = 0; j < GRID_HEIGHT; j++) {
+        grid[i][j].type = empty;
+        }
+      }
+      draw(grid, piece);
     }
-    draw(grid, piece);
   }
   CloseWindow();
   return 0;
@@ -40,6 +49,7 @@ int main() {
 
 struct block place_block() {
   struct block piece;
+
   piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
 
   for (int i = 0; i < 4; i++) {
@@ -49,7 +59,7 @@ struct block place_block() {
   }
 
   struct coordinates sub_coord;
-  sub_coord.x = 1;
+  sub_coord.x = rand() % 2 + 1; // For balancing s and z piece.
   sub_coord.y = 0;
 
   piece.coord[sub_coord.x][sub_coord.y] = falling;
@@ -99,7 +109,7 @@ struct coordinates place_sub_block(struct block piece, struct coordinates sub_co
     if (piece.coord[new_coord.x][new_coord.y] != falling) {
       return new_coord;
     } else {
-      place_sub_block(piece, new_coord);
+      return place_sub_block(piece, new_coord);
     }
   }
   return place_sub_block(piece, sub_coord);

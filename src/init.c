@@ -1,7 +1,7 @@
 #include "init.h"
+#include "main.h"
 
 void initialize_game(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]) {
-
   // Init playing window.
   InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "tetriC");
   SetTargetFPS(60);
