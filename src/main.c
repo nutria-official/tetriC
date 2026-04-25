@@ -2,22 +2,33 @@
 #include "draw.h"
 #include "update.h"
 #include "init.h"
+#include <stdlib.h>
 
 struct block place_block();
 
 int main() {
   int frame_counter = 0;
-  int speed = 60;
+  int frames_between_fall = 60;
   struct Grid grid[GRID_WIDTH][GRID_HEIGHT];
   struct block piece = place_block();
 
   initialize_game(grid);
+
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      if (piece.coord[j][i] == falling) {
+        grid[piece.position.x + j][i].type = falling;
+        grid[piece.position.x + j][i].colour = piece.colour;
+      }
+    }
+  }
+
   draw(grid, piece);
 
   while(!WindowShouldClose()) {
     frame_counter++;
-    player_inputs(grid, &piece, &speed);
-    if (frame_counter >= speed) {
+    player_inputs(grid, &piece, &frames_between_fall);
+    if (frame_counter >= frames_between_fall) {
       update(grid, &piece);
       frame_counter = 0;
     }
@@ -29,109 +40,67 @@ int main() {
 
 struct block place_block() {
   struct block piece;
-  piece.tetromino = rand() % 7;
-  switch (piece.tetromino) {
-    case t:
-      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
-      piece.coord[0].x = 5;
-      piece.coord[0].y = 0;
+  piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
 
-      piece.coord[1].x = 4;
-      piece.coord[1].y = 1;
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+       piece.coord[j][i] = empty;
+    }
+  }
 
-      piece.coord[2].x = 5;
-      piece.coord[2].y = 1;
+  struct coordinates sub_coord;
+  sub_coord.x = 1;
+  sub_coord.y = 0;
 
-      piece.coord[3].x = 6;
-      piece.coord[3].y = 1;
-      break;
-    case i:
-      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
-      piece.coord[0].x = 5;
-      piece.coord[0].y = 0;
+  piece.coord[sub_coord.x][sub_coord.y] = falling;
 
-      piece.coord[1].x = 5;
-      piece.coord[1].y = 1;
-
-      piece.coord[2].x = 5;
-      piece.coord[2].y = 2;
-
-      piece.coord[3].x = 5;
-      piece.coord[3].y = 3;
-      break;
-    case l:
-      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
-      piece.coord[0].x = 5;
-      piece.coord[0].y = 0;
-
-      piece.coord[1].x = 5;
-      piece.coord[1].y = 1;
-
-      piece.coord[2].x = 5;
-      piece.coord[2].y = 2;
-
-      piece.coord[3].x = 6;
-      piece.coord[3].y = 2;
-      break;
-    case j:
-      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
-      piece.coord[0].x = 5;
-      piece.coord[0].y = 0;
-
-      piece.coord[1].x = 5;
-      piece.coord[1].y = 1;
-
-      piece.coord[2].x = 4;
-      piece.coord[2].y = 2;
-
-      piece.coord[3].x = 5;
-      piece.coord[3].y = 2;
-      break;
-    case z:
-      piece.colour = (Color){rand()%256,rand()%256,rand()%256,255};
-      piece.coord[0].x = 4;
-      piece.coord[0].y = 0;
-
-      piece.coord[1].x = 5;
-      piece.coord[1].y = 0;
-
-      piece.coord[2].x = 5;
-      piece.coord[2].y = 1;
-
-      piece.coord[3].x = 6;
-      piece.coord[3].y = 1;
-      break;
-    case s:
-      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
-      piece.coord[0].x = 5;
-      piece.coord[0].y = 0;
-
-      piece.coord[1].x = 6;
-      piece.coord[1].y = 0;
-
-      piece.coord[2].x = 4;
-      piece.coord[2].y = 1;
-
-      piece.coord[3].x = 5;
-      piece.coord[3].y = 1;
-      break;
-    case o:
-      piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
-      piece.coord[0].x = 5;
-      piece.coord[0].y = 0;
-
-      piece.coord[1].x = 6;
-      piece.coord[1].y = 0;
-
-      piece.coord[2].x = 5;
-      piece.coord[2].y = 1;
-
-      piece.coord[3].x = 6;
-      piece.coord[3].y = 1;
-      break;
-    default:
-      piece.tetromino = oops;
-      break;
+  for (int i = 0; i < 3; i++) {
+    sub_coord = place_sub_block(piece, sub_coord);
+    piece.coord[sub_coord.x][sub_coord.y] = falling;
+  }
+  piece.position.x = 3;
+  piece.position.y = 0;
+  printf("placed block\n");
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      if(piece.coord[j][i] == falling) {
+        printf("x: %d y: %d\n", j, i);
+      }
+    }
   }
   return piece;
+}
+
+struct coordinates place_sub_block(struct block piece, struct coordinates sub_coord) {
+  struct coordinates new_coord = sub_coord;
+   int direction = rand()%4;
+   switch(direction) {
+    case up:
+      new_coord.y -=1;
+      break;
+    case down:
+      new_coord.y +=1;
+      break;
+    case left:
+      new_coord.x -=1;
+      break;
+    case right:
+      new_coord.x +=1;
+      break;
+    default:
+      printf("This should not happen\n");
+      break;
+   }
+  if (new_coord.x >= 0 &&
+      new_coord.x < 4  &&
+      new_coord.y >= 0 &&
+      new_coord.y < 4)
+  {
+    if (piece.coord[new_coord.x][new_coord.y] != falling) {
+      return new_coord;
+    } else {
+      place_sub_block(piece, new_coord);
+    }
+  }
+  return place_sub_block(piece, sub_coord);
 }

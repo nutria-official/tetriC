@@ -11,24 +11,24 @@
 #define WINDOW_WIDTH 1280
 #define SQUARE_EDGE 30 // Amount of pixels one side of a drawn square is wide.
 
-struct block place_block();
 
-enum tetrominoes {
-  t,
-  i,
-  l,
-  j,
-  z,
-  s,
-  o,
-  oops,
-};
+struct block place_block();
+struct coordinates place_sub_block(struct block piece, struct coordinates sub_coord);
+
 enum types {
   empty,
   falling,
   scrap,
 };
-struct coordinate {
+
+enum directinos {
+  up,
+  down,
+  left,
+  right,
+};
+
+struct coordinates {
   int x;
   int y;
 };
@@ -39,10 +39,9 @@ struct Grid {
 };
 
 struct block {
-  struct coordinate coord[4]; // Matrix size for all blocks.
-  enum tetrominoes tetromino;
+  enum types coord[4][4]; // Matrix size for all blocks.
   struct Color colour;
+  struct coordinates position;
 };
-
 
 #endif
