@@ -19,8 +19,8 @@ void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
           printf("You dead fr bruh, git gut\n");
         }
         if (piece->coord[j][i] == falling) {
-          grid[piece->position.x + j][i].type = falling;
-          grid[piece->position.x + j][i].colour = piece->colour;
+          grid[piece->position.x + j][piece->position.y + i].type = falling;
+          grid[piece->position.x + j][piece->position.y + i].colour = piece->colour;
         }
       }
     }
@@ -42,7 +42,7 @@ void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
 }
 
 bool floor_collision(struct block piece) {
-  if (piece.position.y >= GRID_HEIGHT - 4) {
+  if (piece.position.y >= GRID_HEIGHT - 5) {
     for (int i = 3; i >= 0; i--) {
       for (int j = 3; j >= 0; j--) {
         if (piece.coord[j][i] == falling && i + piece.position.y == GRID_HEIGHT - 1) {
@@ -131,7 +131,20 @@ void move_tetromino(struct Grid (*grid)[24], struct block *piece, int *frames_be
         }
       }
     }
-    piece->position.x++;
+    if(piece->position.x + 3 < GRID_WIDTH) {
+      piece->position.x++;
+    } else {
+      if(rightest_coord != 3 ) {
+        for (int i = 3; i >= 0; i--) {
+          for (int j = 3; j >= 0; j--) {
+            if (piece->coord[j][i] == falling) {
+              piece->coord[j][i] = empty;
+              piece->coord[j + 1][i] = falling;
+            }
+          }
+        }
+      }
+    }
   } else if (IsKeyPressed(KEY_LEFT) && can_move_left) {
     for (int i = 0; i < 4; i++) { // -- do to the way that the tetromino_subsquares are drawn.
       for (int j = 0; j < 4; j++) {
@@ -142,7 +155,20 @@ void move_tetromino(struct Grid (*grid)[24], struct block *piece, int *frames_be
         }
       }
     }
-    piece->position.x--;
+    if(piece->position.x > 0) {
+      piece->position.x--;
+    } else {
+      if(leftest_coord != 0) {
+        for (int i = 0; i < 4; i++) {
+          for (int j = 0; j < 4; j++) {
+            if (piece->coord[j][i] == falling) {
+              piece->coord[j][i] = empty;
+              piece->coord[j - 1][i] = falling;
+            }
+          }
+        }
+      }
+    }
   }
   if (IsKeyDown(KEY_DOWN)) {
     *frames_between_fall = 10;
