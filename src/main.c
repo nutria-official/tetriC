@@ -30,7 +30,7 @@ int main() {
     if (gamestate == playing) {
       player_inputs(grid, &piece, &frames_between_fall);
       if (frame_counter >= frames_between_fall) {
-        update(grid, &piece);
+        update(grid, &piece, &frames_between_fall);
         frame_counter = 0;
       }
       draw(grid, piece);
@@ -114,3 +114,15 @@ struct coordinates place_sub_block(struct block piece, struct coordinates sub_co
   }
   return place_sub_block(piece, sub_coord);
 }
+
+long int power(int base, int exponent) {
+  if (exponent == 0) {
+    return 1;
+  } 
+  int result = base;
+  for (int i = 1; i < exponent; i++) {
+    result *= base;
+  }
+  return result;
+}
+

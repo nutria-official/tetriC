@@ -1,7 +1,10 @@
 #include "update.h"
 #include "main.h"
 
-void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
+long int score = 0;
+static int cleared_lines_total = 0;
+
+void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int* frames_between_fall) {
   if(floor_collision(*piece) || tetromino_collision(grid, *piece)) {
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
@@ -10,6 +13,7 @@ void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
         }
       }
     }
+    clear_lines(grid, frames_between_fall);
     *piece = place_block();
   
     for (int i = 0; i < 4; i++) {
@@ -35,10 +39,20 @@ void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
         } 
       }
     }
-    piece->position.y++;
-    printf("moved down\n");
+    if (piece->position.y + 4 < GRID_HEIGHT) {
+      piece->position.y++;
+    } else {
+      for (int i = 3; i >= 0; i--) {
+        for (int j = 3; j >= 0; j--) {
+          if (piece->coord[j][i] == falling) {
+            piece->coord[j][i] = empty;
+            piece->coord[j][i + 1] = falling;
+          }
+        }
+      }
+    }
+    printf("score: %ld\n", score);
   }
-  clear_lines(grid);
 }
 
 bool floor_collision(struct block piece) {
@@ -73,7 +87,8 @@ bool tetromino_collision(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block
   return false;
 }
 
-void clear_lines(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]) {
+void clear_lines(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], int* frames_between_fall) {
+  int cleared_lines = 0; // From 0 to 4.
   for (int i = 0; i < GRID_HEIGHT; i++) {
     int scrap_spaces = 0;
     for (int j = 0; j < GRID_WIDTH; j++) {
@@ -82,20 +97,24 @@ void clear_lines(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]) {
       }
     }
     if (scrap_spaces == GRID_WIDTH) {
-      for (int k = i; k > 1; k--) {
+      cleared_lines++;
+      cleared_lines_total++;
+      for (int k = i; k > 0; k--) {
         for (int l = 0; l < GRID_WIDTH; l++) {
           grid[l][k].colour = grid[l][k - 1].colour;
           grid[l][k].type = grid[l][k - 1].type;
         }
       }
-      grid[0][0].type = empty;
     } 
+  }
+  if (cleared_lines > 0) {
+    score = score + power(2, cleared_lines_total) * power(2,cleared_lines);
   }
 }
 
 void player_inputs(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int *frames_between_fall) {
   move_tetromino(grid, piece, frames_between_fall);
-  //rotate_tetromino(grid, piece);
+  rotate_tetromino(grid, piece);
 }
 
 void move_tetromino(struct Grid (*grid)[24], struct block *piece, int *frames_between_fall) {
@@ -131,7 +150,7 @@ void move_tetromino(struct Grid (*grid)[24], struct block *piece, int *frames_be
         }
       }
     }
-    if(piece->position.x + 3 < GRID_WIDTH) {
+    if(piece->position.x + 4 < GRID_WIDTH) {
       piece->position.x++;
     } else {
       if(rightest_coord != 3 ) {
@@ -177,14 +196,72 @@ void move_tetromino(struct Grid (*grid)[24], struct block *piece, int *frames_be
   }
 }
 
-/*void rotate_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
+void rotate_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
+  bool can_rotate = true;
   if(IsKeyPressed(KEY_X)) {
-    if(piece->tetromino != o || piece->tetromino != i) {
-      piece->coord[1]
+    struct block rotated_piece;
+    rotated_piece.position = piece->position;
+    rotated_piece.colour = piece->colour;
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        if (piece->coord[j][i] == falling) {
+          if (grid[rotated_piece.position.x - i + 3][rotated_piece.position.y + j].type == scrap) {
+            can_rotate = false;
+          }
+          rotated_piece.coord[-i + 3][j] = falling;
+        } else {
+          rotated_piece.coord[-i + 3][j] = empty;
+        }
+      }
+    }
+    if (can_rotate) {
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+          if (piece->coord[j][i] == falling) {
+            grid[rotated_piece.position.x - i + 3][rotated_piece.position.y + j].type = falling;
+            grid[rotated_piece.position.x - i + 3][rotated_piece.position.y + j].colour = rotated_piece.colour;
+          } else {
+            if (grid[rotated_piece.position.x - i + 3][rotated_piece.position.y + j].type == falling) {
+              grid[rotated_piece.position.x - i + 3][rotated_piece.position.y + j].type = empty;
+            }
+          }
+        }
+      }
+      *piece = rotated_piece;
     }
   }
-  else if (IsKeyPressed(KEY_Z))
+  can_rotate = true;
+  if (IsKeyPressed(KEY_Z))
   {
-
+    struct block rotated_piece;
+    rotated_piece.position = piece->position;
+    rotated_piece.colour = piece->colour;
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        if (piece->coord[j][i] == falling) {
+          if (grid[rotated_piece.position.x + i][rotated_piece.position.y - j + 3].type == scrap) {
+            can_rotate = false;
+          }
+          rotated_piece.coord[i][-j + 3] = falling;
+        } else {
+          rotated_piece.coord[i][-j + 3] = empty;
+        }
+      }
+    }
+    if (can_rotate) {
+      for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+          if (piece->coord[j][i] == falling) {
+            grid[rotated_piece.position.x + i][rotated_piece.position.y - j + 3].type = falling;
+            grid[rotated_piece.position.x + i][rotated_piece.position.y - j + 3].colour = rotated_piece.colour;
+          } else {
+            if (grid[rotated_piece.position.x + i][rotated_piece.position.y - j + 3].type == falling) {
+              grid[rotated_piece.position.x + i][rotated_piece.position.y - j + 3].type = empty;
+            }
+          }
+        }
+      }
+      *piece = rotated_piece;
+    }
   }
-}*/
+}

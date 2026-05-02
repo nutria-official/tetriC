@@ -14,8 +14,10 @@
 
 struct block place_block();
 struct coordinates place_sub_block(struct block piece, struct coordinates sub_coord);
+long int power(int base, int exponent);
 
 extern int gamestate;
+extern long int score;
 
 enum types {
   empty,
