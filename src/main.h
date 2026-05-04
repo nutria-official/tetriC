@@ -17,6 +17,7 @@ struct coordinates place_sub_block(struct block piece, struct coordinates sub_co
 
 extern int gamestate;
 extern long int score;
+extern int frame_rate;
 
 enum types {
   empty,

@@ -7,10 +7,15 @@
 
 struct block place_block();
 int gamestate = menu;
+int frame_rate = 60;
 
 int main() {
+  // Init playing window.
+  InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "tetriC");
+  SetTargetFPS(frame_rate);
+
   int frame_counter = 0;
-  int frames_between_fall = 60;
+  int frames_between_fall = frame_rate;
   struct Grid grid[GRID_WIDTH][GRID_HEIGHT];
   initialize_game(grid);
   struct block piece = place_block();
@@ -49,6 +54,14 @@ int main() {
         gamestate = playing;
         piece = place_block();
         initialize_game(grid);
+        for (int i = 0; i < 4; i++) {
+          for (int j = 0; j < 4; j++) {
+            if (piece.coord[j][i] == falling) {
+              grid[piece.position.x + j][i].type = falling;
+              grid[piece.position.x + j][i].colour = piece.colour;
+            }
+          }
+        }
       }
     }
   }

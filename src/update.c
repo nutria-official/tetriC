@@ -2,7 +2,7 @@
 #include "main.h"
 
 long int score = 0;
-static int cleared_lines_total = 0;
+static float cleared_lines_total = 0;
 
 void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int* frames_between_fall) {
   if(floor_collision(*piece) || tetromino_collision(grid, *piece)) {
@@ -117,7 +117,7 @@ void player_inputs(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piec
   rotate_tetromino(grid, piece);
 }
 
-void move_tetromino(struct Grid (*grid)[24], struct block *piece, int *frames_between_fall) {
+void move_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int *frames_between_fall) {
   int leftest_coord = 3;
   int rightest_coord = 0;
   bool can_move_left = true;
@@ -190,9 +190,9 @@ void move_tetromino(struct Grid (*grid)[24], struct block *piece, int *frames_be
     }
   }
   if (IsKeyDown(KEY_DOWN)) {
-    *frames_between_fall = 10;
+    *frames_between_fall = ceil(*frames_between_fall / 5);
   } else {
-    *frames_between_fall = 60;
+    *frames_between_fall = ceil( frame_rate / (frame_rate * (((cleared_lines_total + 1) / 3115) + 1))); // 3116 is the number of lines cleared by tetris to get max score;
   }
 }
 
