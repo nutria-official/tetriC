@@ -8,6 +8,7 @@
 struct block place_block();
 int gamestate = menu;
 int frame_rate = 60;
+int frames_between_fall = 60;
 
 int main() {
   // Init playing window.
@@ -15,7 +16,6 @@ int main() {
   SetTargetFPS(frame_rate);
 
   int frame_counter = 0;
-  int frames_between_fall = frame_rate;
   struct Grid grid[GRID_WIDTH][GRID_HEIGHT];
   initialize_game(grid);
   struct block piece = place_block();
@@ -32,11 +32,12 @@ int main() {
   while(!WindowShouldClose()) {
     frame_counter++;
     if (gamestate == playing) {
-      player_inputs(grid, &piece, &frames_between_fall);
+      player_inputs(grid, &piece);
       if (frame_counter >= frames_between_fall) {
-        update(grid, &piece, &frames_between_fall);
+        update(grid, &piece);
         frame_counter = 0;
       }
+      update_shadow(grid, piece);
       draw_game(grid, piece);
     } else if (gamestate == dead) {
       draw_dead(grid);
@@ -64,6 +65,7 @@ int main() {
         }
       }
     }
+    printf("Fall: %d\n", frames_between_fall);
   }
   CloseWindow();
   return 0;
@@ -71,8 +73,11 @@ int main() {
 
 struct block place_block() {
   struct block piece;
-
-  piece.colour = (Color){rand()%256,rand()%256,rand()%256, 255};
+  int red = rand()%256;
+  int green = rand()%256;
+  int blue = rand()%256; 
+  piece.colour = (Color){red, green, blue, 255};
+  piece.shadow = (Color){red, green, blue, 50};
 
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {

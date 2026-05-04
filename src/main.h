@@ -18,11 +18,13 @@ struct coordinates place_sub_block(struct block piece, struct coordinates sub_co
 extern int gamestate;
 extern long int score;
 extern int frame_rate;
+extern int frames_between_fall;
 
 enum types {
   empty,
   falling,
   scrap,
+  shadow,
 };
 
 enum game_states {
@@ -51,6 +53,7 @@ struct Grid {
 struct block {
   enum types coord[4][4]; // Matrix size for all blocks.
   struct Color colour;
+  struct Color shadow;
   struct coordinates position;
 };
 

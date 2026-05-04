@@ -1,11 +1,14 @@
 #include "update.h"
 #include "main.h"
+#include <raylib.h>
 
 long int score = 0;
 static float cleared_lines_total = 0;
 
-void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int* frames_between_fall) {
+bool update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
+  bool has_collided = false;
   if(floor_collision(*piece) || tetromino_collision(grid, *piece)) {
+    has_collided = true;
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         if (grid[piece->position.x + j][piece->position.y + i].type == falling) {
@@ -13,14 +16,13 @@ void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int*
         }
       }
     }
-    clear_lines(grid, frames_between_fall);
+    clear_lines(grid);
     *piece = place_block();
   
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
-        if (grid[piece->position.x + j][piece->position.y + i].type == scrap) {
+        if (grid[piece->position.x + j][piece->position.y + i].type == scrap && piece->coord[j][i] == falling) {
           gamestate = dead;
-          printf("You dead fr bruh, git gut\n");
         }
         if (piece->coord[j][i] == falling) {
           grid[piece->position.x + j][piece->position.y + i].type = falling;
@@ -51,8 +53,8 @@ void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int*
         }
       }
     }
-    printf("score: %ld\n", score);
   }
+  return has_collided;
 }
 
 bool floor_collision(struct block piece) {
@@ -87,7 +89,7 @@ bool tetromino_collision(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block
   return false;
 }
 
-void clear_lines(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], int* frames_between_fall) {
+void clear_lines(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]) {
   int cleared_lines = 0; // From 0 to 4.
   for (int i = 0; i < GRID_HEIGHT; i++) {
     int scrap_spaces = 0;
@@ -112,12 +114,12 @@ void clear_lines(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], int* frames_between_
   }
 }
 
-void player_inputs(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int *frames_between_fall) {
-  move_tetromino(grid, piece, frames_between_fall);
+void player_inputs(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
+  move_tetromino(grid, piece);
   rotate_tetromino(grid, piece);
 }
 
-void move_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int *frames_between_fall) {
+void move_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
   int leftest_coord = 3;
   int rightest_coord = 0;
   bool can_move_left = true;
@@ -190,9 +192,12 @@ void move_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *pie
     }
   }
   if (IsKeyDown(KEY_DOWN)) {
-    *frames_between_fall = ceil(*frames_between_fall / 5);
+    frames_between_fall = (frame_rate - (cleared_lines_total / (3116 / frame_rate))) / 6; // C floors by default with integers.
   } else {
-    *frames_between_fall = ceil( frame_rate / (frame_rate * (((cleared_lines_total + 1) / 3115) + 1))); // 3116 is the number of lines cleared by tetris to get max score;
+    frames_between_fall = frame_rate - (cleared_lines_total / (3116 / frame_rate)); // 3116 is the number of lines cleared by tetris to get max score;
+  }
+  if(IsKeyPressed(KEY_SPACE)) {
+    while(!update(grid, piece));
   }
 }
 
@@ -262,6 +267,30 @@ void rotate_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *p
         }
       }
       *piece = rotated_piece;
+    }
+  }
+}
+
+void update_shadow(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block piece) {
+  struct Grid layer_grid[GRID_WIDTH][GRID_HEIGHT];
+  for (int i = 0; i < GRID_HEIGHT; i++) {
+    for (int j = 0; j < GRID_WIDTH; j++) {
+      layer_grid[j][i].type = grid[j][i].type;
+    }
+  }
+  struct block shadow_piece = piece;
+
+  while(!update(layer_grid, &shadow_piece));
+
+  for (int i = 0; i < GRID_HEIGHT; i++) {
+    for (int j = 0; j < GRID_WIDTH; j++) {
+      if(grid[j][i].type == shadow) {
+        grid[j][i].type = empty;
+      }
+      if(layer_grid[j][i].type == scrap && grid[j][i].type != scrap) {
+        grid[j][i].type = shadow;
+        grid[j][i].colour = piece.shadow;
+      }
     }
   }
 }

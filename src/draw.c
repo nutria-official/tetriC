@@ -30,7 +30,7 @@ void draw_game(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block piece) {
   // Draw blocks,
     for (int i = 0; i < GRID_HEIGHT; i++) {
       for (int j = 0; j < GRID_WIDTH; j++) {
-        if (grid[j][i].type == falling || grid[j][i].type == scrap) {
+        if (grid[j][i].type == falling || grid[j][i].type == scrap || grid[j][i].type == shadow) {
           DrawRectangle(calibration_width + j * SQUARE_EDGE, calibration_height + i * SQUARE_EDGE, SQUARE_EDGE, SQUARE_EDGE, grid[j][i].colour);
         }
       }
