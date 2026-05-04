@@ -145,7 +145,7 @@ void move_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *pie
       }
     }
   }
-  if (IsKeyPressed(KEY_RIGHT) && can_move_right) {
+  if ((IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_L)) && can_move_right) {
     for (int i = 3; i >= 0; i--) { // -- do to the way that the tetromino_subsquares are drawn.
       for (int j = 3; j >=0; j--) {
         if (piece->coord[j][i] == falling) {
@@ -169,7 +169,7 @@ void move_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *pie
         }
       }
     }
-  } else if (IsKeyPressed(KEY_LEFT) && can_move_left) {
+  } else if ((IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_H)) && can_move_left) {
     for (int i = 0; i < 4; i++) { // -- do to the way that the tetromino_subsquares are drawn.
       for (int j = 0; j < 4; j++) {
         if (piece->coord[j][i] == falling) {
@@ -194,7 +194,7 @@ void move_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *pie
       }
     }
   }
-  if (IsKeyDown(KEY_DOWN)) {
+  if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_J)) {
     frames_between_fall = (frame_rate - (cleared_lines_total / (3116 / frame_rate))) / 6; // C floors by default with integers.
   } else {
     frames_between_fall = frame_rate - (cleared_lines_total / (3116 / frame_rate)); // 3116 is the number of lines cleared by tetris to get max score;
