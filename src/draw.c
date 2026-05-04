@@ -18,6 +18,8 @@ void draw_menu(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]) {
     }
     DrawRectangle(calibration_width, calibration_height + GRID_HEIGHT*SQUARE_EDGE/2 - SQUARE_EDGE * 2, GRID_WIDTH*SQUARE_EDGE, SQUARE_EDGE * 4, GREEN);
     DrawText(TextFormat("Press enter to start"), calibration_width + 40, GRID_HEIGHT*SQUARE_EDGE/2 - 20, 20, RED);
+    DrawRectangle(calibration_width + GRID_WIDTH*SQUARE_EDGE + SQUARE_EDGE, calibration_height, SQUARE_EDGE * 8, GRID_HEIGHT*SQUARE_EDGE/5, BLACK);
+    DrawText(TextFormat("Right: Right arrow\nLeft: Left arrow\nSpeed up: Down arrow\nPlace: space\nRotate: X & Z\nVIM movement support"), calibration_width + GRID_WIDTH*SQUARE_EDGE + SQUARE_EDGE, calibration_height, 20, RED);
     
   EndDrawing();
 }
