@@ -32,26 +32,27 @@ int main() {
   while(!WindowShouldClose()) {
     frame_counter++;
     if (gamestate == playing) {
-      update_shadow(grid, piece);
       player_inputs(grid, &piece);
       if (frame_counter >= frames_between_fall) {
         update(grid, &piece);
         frame_counter = 0;
       }
+      update_shadow(grid, piece);
       draw_game(grid, piece);
     } else if (gamestate == dead) {
       draw_dead(grid);
       if(IsKeyPressed(KEY_SPACE)) {
         gamestate = menu;
       }
-      if(IsKeyPressed(KEY_ENTER)) {
+      if(IsKeyPressed(KEY_SPACE)) {
         gamestate = playing;
         piece = place_block();
         initialize_game(grid);
       }
     } else if (gamestate == menu) {
       draw_menu(grid);
-      if(IsKeyPressed(KEY_SPACE)) {
+      if(IsKeyPressed(KEY_ENTER)) {
+        score = 0;
         gamestate = playing;
         piece = place_block();
         initialize_game(grid);
@@ -77,7 +78,7 @@ struct block place_block() {
   int green = rand()%256;
   int blue = rand()%256; 
   piece.colour = (Color){red, green, blue, 255};
-  piece.shadow = (Color){red, green, blue, 50};
+  piece.shadow = (Color){red, green, blue, 100};
 
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
@@ -97,14 +98,6 @@ struct block place_block() {
   }
   piece.position.x = 3;
   piece.position.y = 0;
-  printf("placed block\n");
-  for (int i = 0; i < 4; i++) {
-    for (int j = 0; j < 4; j++) {
-      if(piece.coord[j][i] == falling) {
-        printf("x: %d y: %d\n", j, i);
-      }
-    }
-  }
   return piece;
 }
 

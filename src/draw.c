@@ -17,7 +17,7 @@ void draw_menu(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]) {
       }
     }
     DrawRectangle(calibration_width, calibration_height + GRID_HEIGHT*SQUARE_EDGE/2 - SQUARE_EDGE * 2, GRID_WIDTH*SQUARE_EDGE, SQUARE_EDGE * 4, GREEN);
-    DrawText(TextFormat("Press space to start"), calibration_width, GRID_HEIGHT*SQUARE_EDGE/2, 20, RED);
+    DrawText(TextFormat("Press enter to start"), calibration_width + 40, GRID_HEIGHT*SQUARE_EDGE/2 - 20, 20, RED);
     
   EndDrawing();
 }
@@ -35,6 +35,8 @@ void draw_game(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block piece) {
         }
       }
     }
+  DrawRectangle(calibration_width + GRID_WIDTH*SQUARE_EDGE + SQUARE_EDGE, calibration_height, SQUARE_EDGE * 4, GRID_HEIGHT*SQUARE_EDGE/4, BLACK);
+  DrawText(TextFormat("Score: %d", score), calibration_width + GRID_WIDTH*SQUARE_EDGE + SQUARE_EDGE, calibration_height, 20, RED);
   EndDrawing();
 }
 
@@ -50,7 +52,7 @@ void draw_dead(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]) {
       }
     }
     DrawRectangle(calibration_width, calibration_height + GRID_HEIGHT*SQUARE_EDGE/2 - SQUARE_EDGE * 2, GRID_WIDTH*SQUARE_EDGE, SQUARE_EDGE * 4, GREEN);
-    DrawText(TextFormat("Press space to menu\n Press enter to game"), calibration_width, GRID_HEIGHT*SQUARE_EDGE/2, 20, RED);
+    DrawText(TextFormat("Press enter to menu\nPress space to game\nScore: %d", score), calibration_width + 40, GRID_HEIGHT*SQUARE_EDGE/2 - 20, 20, RED);
   EndDrawing();
 }
 

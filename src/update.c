@@ -4,6 +4,7 @@
 
 long int score = 0;
 static float cleared_lines_total = 0;
+static bool should_give_score = true;
 
 bool update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
   bool has_collided = false;
@@ -100,7 +101,9 @@ void clear_lines(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]) {
     }
     if (scrap_spaces == GRID_WIDTH) {
       cleared_lines++;
-      cleared_lines_total++;
+      if (should_give_score) {
+        cleared_lines_total++;
+      }
       for (int k = i; k > 0; k--) {
         for (int l = 0; l < GRID_WIDTH; l++) {
           grid[l][k].colour = grid[l][k - 1].colour;
@@ -109,7 +112,7 @@ void clear_lines(struct Grid grid[GRID_WIDTH][GRID_HEIGHT]) {
       }
     } 
   }
-  if (cleared_lines > 0) {
+  if (cleared_lines > 0 && should_give_score) {
     score = score + ceil(pow(2, cleared_lines) * pow(1.005,cleared_lines_total));
   }
 }
@@ -236,9 +239,7 @@ void rotate_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *p
   can_rotate = true;
   if (IsKeyPressed(KEY_Z))
   {
-    struct block rotated_piece;
-    rotated_piece.position = piece->position;
-    rotated_piece.colour = piece->colour;
+    struct block rotated_piece = *piece;
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         if (piece->coord[j][i] == falling) {
@@ -278,7 +279,11 @@ void update_shadow(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block piece
   }
   struct block shadow_piece = piece;
 
+  should_give_score = false;
+
   while(!update(layer_grid, &shadow_piece));
+
+  should_give_score = true;
 
   for (int i = 0; i < GRID_HEIGHT; i++) {
     for (int j = 0; j < GRID_WIDTH; j++) {
