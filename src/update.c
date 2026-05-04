@@ -108,7 +108,7 @@ void clear_lines(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], int* frames_between_
     } 
   }
   if (cleared_lines > 0) {
-    score = score + power(2, cleared_lines_total) * power(2,cleared_lines);
+    score = score + ceil(pow(2, cleared_lines) * pow(1.005,cleared_lines_total));
   }
 }
 

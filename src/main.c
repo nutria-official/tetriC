@@ -2,10 +2,11 @@
 #include "draw.h"
 #include "update.h"
 #include "init.h"
+#include <raylib.h>
 #include <stdlib.h>
 
 struct block place_block();
-int gamestate = playing;
+int gamestate = menu;
 
 int main() {
   int frame_counter = 0;
@@ -23,8 +24,6 @@ int main() {
     }
   }
 
-  draw(grid, piece);
-
   while(!WindowShouldClose()) {
     frame_counter++;
     if (gamestate == playing) {
@@ -33,14 +32,24 @@ int main() {
         update(grid, &piece, &frames_between_fall);
         frame_counter = 0;
       }
-      draw(grid, piece);
+      draw_game(grid, piece);
     } else if (gamestate == dead) {
-      for (int i = 0; i < GRID_WIDTH; i++) {
-        for (int j = 0; j < GRID_HEIGHT; j++) {
-        grid[i][j].type = empty;
-        }
+      draw_dead(grid);
+      if(IsKeyPressed(KEY_SPACE)) {
+        gamestate = menu;
       }
-      draw(grid, piece);
+      if(IsKeyPressed(KEY_ENTER)) {
+        gamestate = playing;
+        piece = place_block();
+        initialize_game(grid);
+      }
+    } else if (gamestate == menu) {
+      draw_menu(grid);
+      if(IsKeyPressed(KEY_SPACE)) {
+        gamestate = playing;
+        piece = place_block();
+        initialize_game(grid);
+      }
     }
   }
   CloseWindow();
@@ -114,15 +123,3 @@ struct coordinates place_sub_block(struct block piece, struct coordinates sub_co
   }
   return place_sub_block(piece, sub_coord);
 }
-
-long int power(int base, int exponent) {
-  if (exponent == 0) {
-    return 1;
-  } 
-  int result = base;
-  for (int i = 1; i < exponent; i++) {
-    result *= base;
-  }
-  return result;
-}
-

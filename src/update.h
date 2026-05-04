@@ -2,6 +2,7 @@
 #define UPDATE_H
 
 #include "main.h"
+#include <math.h>
 
 void update(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int* frames_between_fall);
 void player_inputs(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece, int *frames_between_fall);
