@@ -32,12 +32,12 @@ int main() {
   while(!WindowShouldClose()) {
     frame_counter++;
     if (gamestate == playing) {
+      update_shadow(grid, piece);
       player_inputs(grid, &piece);
       if (frame_counter >= frames_between_fall) {
         update(grid, &piece);
         frame_counter = 0;
       }
-      update_shadow(grid, piece);
       draw_game(grid, piece);
     } else if (gamestate == dead) {
       draw_dead(grid);

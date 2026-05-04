@@ -204,9 +204,7 @@ void move_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *pie
 void rotate_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *piece) {
   bool can_rotate = true;
   if(IsKeyPressed(KEY_X)) {
-    struct block rotated_piece;
-    rotated_piece.position = piece->position;
-    rotated_piece.colour = piece->colour;
+    struct block rotated_piece = *piece;
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         if (piece->coord[j][i] == falling) {
@@ -287,7 +285,7 @@ void update_shadow(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block piece
       if(grid[j][i].type == shadow) {
         grid[j][i].type = empty;
       }
-      if(layer_grid[j][i].type == scrap && grid[j][i].type != scrap) {
+      if(layer_grid[j][i].type == scrap && grid[j][i].type != scrap && grid[j][i].type != falling) {
         grid[j][i].type = shadow;
         grid[j][i].colour = piece.shadow;
       }
