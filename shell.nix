@@ -9,6 +9,6 @@ pkgs.mkShell {
 
   shellHook = ''
     export LD_LIBRARY_PATH="${pkgs.raylib}/lib:$LD_LIBRARY_PATH"
-    echo "tetriC environtment loaded. Compile with ./run.c"
+    echo "tetriC environtment loaded. Compile for linux with ./compile_linux.sh"
   '';
 }

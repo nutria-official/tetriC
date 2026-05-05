@@ -66,7 +66,7 @@ int main() {
         }
       }
     }
-    printf("Fall: %d\n", frames_between_fall);
+    /*printf("Fall: %d\n", frames_between_fall);*/
   }
   CloseWindow();
   return 0;

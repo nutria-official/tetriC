@@ -270,7 +270,7 @@ void rotate_tetromino(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block *p
   }
 }
 
-void update_shadow(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block piece) {
+void update_shadow(struct Grid grid[GRID_WIDTH][GRID_HEIGHT], struct block piece) { // Shardow refers to the ghost like block at the bottom.
   struct Grid layer_grid[GRID_WIDTH][GRID_HEIGHT];
   for (int i = 0; i < GRID_HEIGHT; i++) {
     for (int j = 0; j < GRID_WIDTH; j++) {
